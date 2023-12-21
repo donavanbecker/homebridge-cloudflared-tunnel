@@ -1,6 +1,10 @@
-import { startTunnel } from "ctun";
-import { CloudflaredTunnelPlatformConfig } from './settings';
-import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, Service, Characteristic } from 'homebridge';
+/* Copyright(C) 2017-2023, donavanbecker (https://github.com/donavanbecker). All rights reserved.
+ *
+ * protect-platform.ts: homebridge-cloudflared-tunnel platform class.
+ */
+import { API, DynamicPlatformPlugin, Logging, PlatformAccessory } from 'homebridge';
+import { CloudflaredTunnelPlatformConfig } from './settings.js';
+import { startTunnel, TunnelOptions } from 'untun';
 
 /**
  * HomebridgePlatform
@@ -8,34 +12,53 @@ import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, Service, Charact
  * parse the user config and discover/register accessories with Homebridge.
  */
 export class CloudflaredTunnelPlatform implements DynamicPlatformPlugin {
-  public readonly Service: typeof Service = this.api.hap.Service;
-  public readonly Characteristic: typeof Characteristic = this.api.hap.Characteristic;
-
-  // this is used to track restored cached accessories
-  public readonly accessories: PlatformAccessory[] = [];
+  public accessories: PlatformAccessory[];
+  public readonly api: API;
+  public readonly log: Logging;
 
   version = process.env.npm_package_version || '1.0.0';
   Logging?: string;
   debugMode!: boolean;
   platformLogging?: string;
+  config!: CloudflaredTunnelPlatformConfig;
 
-  constructor(public readonly log: Logger, public readonly config: CloudflaredTunnelPlatformConfig, public readonly api: API) {
-    this.logs();
-    this.debugLog(`Finished initializing platform: ${this.config.name}`);
+  constructor(log: Logging, config: CloudflaredTunnelPlatformConfig, api: API) {
+    // this.logs();
+    //this.debugLog(`Finished initializing platform: ${config.name}`);
+
+    this.accessories = [];
+    this.api = api;
+    this.log = log;
     // only load if configured
-    if (!this.config) {
+    if (!config) {
       return;
     }
+
+    // Plugin options into our config variables.
+    this.config = {
+      platform: 'CloudflaredTunnelPlatform',
+      name: config.name as string,
+      url: config.url as string,
+      port: config.port as number,
+      hostname: config.hostname as string,
+      protocol: config.protocol as 'http' | 'https' | undefined, // Updated type
+      verifyTLS: config.verifyTLS as boolean,
+      logging: config.logging as string,
+      acceptCloudflareNotice: config.acceptCloudflareNotice as boolean,
+    };
+
 
     // verify the config
-    try {
-      this.verifyConfig();
-      this.debugLog('Config OK');
-    } catch (e: any) {
-      this.errorLog(JSON.stringify(e.message));
-      this.debugLog(JSON.stringify(e));
-      return;
-    }
+    (async () => {
+      try {
+        await this.verifyConfig();
+        //this.debugLog('Config OK');
+      } catch (e: any) {
+        //this.errorLog(JSON.stringify(e.message));
+        //this.debugLog(JSON.stringify(e));
+        return;
+      }
+    })();
 
     // When this event is fired it means Homebridge has restored all cached accessories from disk.
     // Dynamic Platform plugins should only register new accessories after this event was fired,
@@ -45,10 +68,12 @@ export class CloudflaredTunnelPlatform implements DynamicPlatformPlugin {
       log.debug('Executed didFinishLaunching callback');
       // run the method to discover / register your devices as accessories
       try {
-        this.discoverDevices();
+        await this.createTunnel();
+        //this.log.info(`Tunnel Status: ${JSON.stringify(tunnel?.close())}`);
       } catch (e: any) {
-        this.errorLog(`Failed to Discover Devices ${JSON.stringify(e.message)}`);
-        this.debugLog(JSON.stringify(e));
+        this.log.error('Failed to Start Tunnel');
+        //this.errorLog(`Failed to Discover Devices ${JSON.stringify(e.message)}`);
+        //this.debugLog(JSON.stringify(e));
       }
     });
   }
@@ -58,7 +83,7 @@ export class CloudflaredTunnelPlatform implements DynamicPlatformPlugin {
    * It should be used to setup event handlers for characteristics and update respective values.
    */
   configureAccessory(accessory: PlatformAccessory) {
-    this.infoLog(`Loading accessory from cache: ${accessory.displayName}`);
+    //this.infoLog(`Loading accessory from cache: ${accessory.displayName}`);
 
     // add the restored accessory to the accessories cache so we can track if it has already been registered
     this.accessories.push(accessory);
@@ -68,119 +93,38 @@ export class CloudflaredTunnelPlatform implements DynamicPlatformPlugin {
    * Verify the config passed to the plugin is valid
    */
   async verifyConfig() {
-    if (!this.config.url && !this.config.hostname) {
-      throw new Error('Missing required config: url');
-    }
-    if (!this.config.port && !this.config.hostname && !this.config.url && !this.config.protocol && !this.config.url) {
-      throw new Error('Missing one of the following configs: port, hostname, url, protocol, please check your config.json');
+    if (!this.config.url && (!this.config.protocol && !this.config.hostname && !this.config.port)) {
+      throw new Error('Missing required config: url or {protocol}://{hostname}:{port}, please check your config.json');
     }
     if (this.config.url && this.config.hostname) {
-      this.debugLog(`URL: ${this.config.url}`);
-      this.debugLog(`Hostname: ${this.config.hostname}`);
-      throw new Error(`Cannot have both url and hostname in config. Please remove one.`);
+      throw new Error('Cannot have both url and hostname in config. Please remove one.');
     }
     if (!this.config.logging) {
       this.config.logging = 'standard';
     }
-    if (!this.config.hostname) {
-      this.config.hostname = 'localhost';
-    }
-    if (!this.config.port) {
-      this.config.port = 8581;
-    }
-    if (!this.config.protocol) {
-      this.config.protocol = 'http';
-    }
-    if (!this.config.verifyTLS) {
-      this.config.verifyTLS = false;
+    if (!this.config.acceptCloudflareNotice) {
+      this.config.acceptCloudflareNotice = false;
     }
   }
 
-  /**
-   * This method is used to discover the your location and devices.
-   * Accessories are registered by either their DeviceClass, DeviceModel, or DeviceID
-   */
-  async discoverDevices() {
-    try {
-      const url = this.config.url || `${this.config.protocol}://${this.config.hostname}:${this.config.port}`;
-      //Default: {protocol}://{hostname}:{port}
-      //The local server URL to tunnel.
-
-      const tunnel = await startTunnel(
-        {
-          url: url,
-          verifyTLS: this.config.verifyTLS,
-        }
-      ); // pass in the port of the server you want to tunnel
-      this.infoLog(`Tunnel URL: ${tunnel}`);
-    } catch {
-      this.errorLog('Failed to Start Tunnel');
+  async createTunnel() {
+    this.log.info(JSON.stringify(this.config));
+    //The local server URL to tunnel.
+    const options: TunnelOptions = {
+      url: this.config.url,
+      protocol: this.config.protocol,
+      hostname: this.config.hostname,
+      port: this.config.port,
+      verifyTLS: this.config.verifyTLS,
+      acceptCloudflareNotice: this.config.acceptCloudflareNotice,
+    };
+    this.log.warn(`Starting Tunnel with Options: ${JSON.stringify(options)}`);
+    const autoTunnel = await startTunnel(options);
+    //this.log.info(`Tunnel Status: ${JSON.stringify(autoTunnel?.close())}`);
+    this.log.info(`Tunnel URL: ${JSON.stringify(autoTunnel?.getURL())}`);
+    if (autoTunnel) {
+      const tunnelURL = await autoTunnel.getURL();
+      this.log.info(`Tunnel URL: ${JSON.stringify(tunnelURL)}`);
     }
-  }
-
-  logs() {
-    this.debugMode = process.argv.includes('-D') || process.argv.includes('--debug');
-    if (this.config.options?.logging === 'debug' || this.config.options?.logging === 'standard' || this.config.options?.logging === 'none') {
-      this.platformLogging = this.config.options!.logging;
-      this.debugWarnLog(`Using Config Logging: ${this.platformLogging}`);
-    } else if (this.debugMode) {
-      this.platformLogging = 'debugMode';
-      this.debugWarnLog(`Using ${this.platformLogging} Logging`);
-    } else {
-      this.platformLogging = 'standard';
-      this.debugWarnLog(`Using ${this.platformLogging} Logging`);
-    }
-  }
-
-  /**
-   * If device level logging is turned on, log to log.warn
-   * Otherwise send debug logs to log.debug
-   */
-  infoLog(...log: any[]): void {
-    if (this.enablingPlatfromLogging()) {
-      this.log.info(String(...log));
-    }
-  }
-
-  warnLog(...log: any[]): void {
-    if (this.enablingPlatfromLogging()) {
-      this.log.warn(String(...log));
-    }
-  }
-
-  debugWarnLog(...log: any[]): void {
-    if (this.enablingPlatfromLogging()) {
-      if (this.platformLogging?.includes('debug')) {
-        this.log.warn('[DEBUG]', String(...log));
-      }
-    }
-  }
-
-  errorLog(...log: any[]): void {
-    if (this.enablingPlatfromLogging()) {
-      this.log.error(String(...log));
-    }
-  }
-
-  debugErrorLog(...log: any[]): void {
-    if (this.enablingPlatfromLogging()) {
-      if (this.platformLogging?.includes('debug')) {
-        this.log.error('[DEBUG]', String(...log));
-      }
-    }
-  }
-
-  debugLog(...log: any[]): void {
-    if (this.enablingPlatfromLogging()) {
-      if (this.platformLogging === 'debugMode') {
-        this.log.debug(String(...log));
-      } else if (this.platformLogging === 'debug') {
-        this.log.info('[DEBUG]', String(...log));
-      }
-    }
-  }
-
-  enablingPlatfromLogging(): boolean {
-    return this.platformLogging?.includes('debug') || this.platformLogging === 'standard';
   }
 }
