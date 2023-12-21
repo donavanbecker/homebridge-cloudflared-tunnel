@@ -3,6 +3,6 @@ contact_links:
   - name: Homebridge Discord Channel for Cloudflared Tunnel
     url: https://discord.gg/8fpZA4S
     about: Please ask and answer questions here.
-  - name: Homebridge-cloudflared-tunnel - Pull Requests
+  - name: homebridge-cloudflared-tunnel - Pull Requests
     url: https://github.com/donavanbecker/homebridge-cloudflared-tunnel/pulls
     about: Please report security vulnerabilities here.
