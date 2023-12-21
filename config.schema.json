@@ -1,0 +1,107 @@
+{
+  "pluginAlias": "CloudflaredTunnel",
+  "pluginType": "platform",
+  "singular": true,
+  "customUi": true,
+  "headerDisplay": "<p align='center'><img width='250px' src='https://raw.githubusercontent.com/donavanbecker/homebridge-cloudflared-tunnel/latest/branding/Homebridge_x_CloudflaredTunnel.svg'></p>\n\n<p>The Homebridge Cloudflared Tunnel plugin allows you to run a Cloudflare-Tunnel for exposing your Homebridge instance for remote access.",
+  "footerDisplay": "Your CloudflaredTunnel has been created. Please raise any issues on our [project page](https://github.com/donavanbecker/homebridge-cloudflared-tunnel/issues).\n\nIf you would like to have other features, fill out [Feature Request Form](https://github.com/donavanbecker/homebridge-cloudflared-tunnel/issues/new?assignees=&labels=&template=feature_request.md).",
+  "schema": {
+    "type": "object",
+    "properties": {
+      "name": {
+        "type": "string",
+        "title": "Name",
+        "default": "CloudflaredTunnel",
+        "required": true
+      },
+      "url": {
+        "type": "string",
+        "title": "Name",
+        "default": "URL",
+        "pattern": "^https?://",
+        "required": false
+      },
+      "port": {
+        "type": "number",
+        "title": "Port",
+        "placeholder": "8581",
+        "required": false
+      },
+      "hostname": {
+        "type": "string",
+        "title": "Name",
+        "default": "hostname",
+        "required": true
+      },
+      "protocol": {
+        "type": "string",
+        "title": "Protocol",
+        "required": true,
+        "default": "",
+        "oneOf": [
+          {
+            "title": "HTTP",
+            "enum": ["http"]
+          },
+          {
+            "title": "HTTPS",
+            "enum": ["https"]
+          }
+        ]
+      },
+      "verifyTLS": {
+        "type": "boolean",
+        "title": "Verify TLS",
+        "required": false
+      },
+      "logging": {
+        "title": "Plugin Logging Setting",
+        "type": "string",
+        "required": true,
+        "default": "",
+        "oneOf": [
+          {
+            "title": "Default Logging",
+            "enum": [""]
+          },
+          {
+            "title": "Standard Logging",
+            "enum": ["standard"]
+          },
+          {
+            "title": "No Logging",
+            "enum": ["none"]
+          },
+          {
+            "title": "Debug Logging",
+            "enum": ["debug"]
+          }
+        ]
+      }
+    }
+  },
+  "layout": [
+    {
+      "type": "fieldset",
+      "title": "Cloudflared Tunnel Settings",
+      "expandable": true,
+      "expanded": false,
+      "items": [
+        "url",
+        "port",
+        "hostname",
+        "protocol",
+        "verifyTLS"
+      ]
+    },
+    {
+      "type": "fieldset",
+      "title": "Advanced Settings",
+      "expandable": true,
+      "expanded": false,
+      "items": [
+        "logging"
+      ]
+    }
+  ]
+}
