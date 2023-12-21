@@ -1,4 +1,5 @@
-import { startTunnel } from "ctun";
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const { startTunnel } = require('ctun');
 import { CloudflaredTunnelPlatformConfig } from './settings';
 import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, Service, Characteristic } from 'homebridge';
 
@@ -77,7 +78,7 @@ export class CloudflaredTunnelPlatform implements DynamicPlatformPlugin {
     if (this.config.url && this.config.hostname) {
       this.debugLog(`URL: ${this.config.url}`);
       this.debugLog(`Hostname: ${this.config.hostname}`);
-      throw new Error(`Cannot have both url and hostname in config. Please remove one.`);
+      throw new Error('Cannot have both url and hostname in config. Please remove one.');
     }
     if (!this.config.logging) {
       this.config.logging = 'standard';
@@ -106,12 +107,7 @@ export class CloudflaredTunnelPlatform implements DynamicPlatformPlugin {
       //Default: {protocol}://{hostname}:{port}
       //The local server URL to tunnel.
 
-      const tunnel = await startTunnel(
-        {
-          url: url,
-          verifyTLS: this.config.verifyTLS,
-        }
-      ); // pass in the port of the server you want to tunnel
+      const tunnel = await startTunnel({ url: url, verifyTLS: this.config.verifyTLS});
       this.infoLog(`Tunnel URL: ${tunnel}`);
     } catch {
       this.errorLog('Failed to Start Tunnel');

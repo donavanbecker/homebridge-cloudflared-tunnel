@@ -16,8 +16,8 @@
       },
       "url": {
         "type": "string",
-        "title": "Name",
-        "default": "URL",
+        "title": "URL",
+        "placeholder": "http://localhost:8581",
         "pattern": "^https?://",
         "required": false
       },
@@ -29,8 +29,8 @@
       },
       "hostname": {
         "type": "string",
-        "title": "Name",
-        "default": "hostname",
+        "title": "hostname",
+        "placeholder": "homebridge.local",
         "required": true
       },
       "protocol": {

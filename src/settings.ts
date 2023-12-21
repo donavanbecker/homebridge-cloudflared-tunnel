@@ -11,10 +11,10 @@ export const PLUGIN_NAME = 'homebridge-cloudflared-tunnel';
 
 //Config
 export interface CloudflaredTunnelPlatformConfig extends PlatformConfig {
-  url: string;
-  port: number;
-  hostname: string;
-  protocol: string;
-  verifyTLS: boolean;
+  url?: string;
+  port?: number;
+  hostname?: string;
+  protocol?: string;
+  verifyTLS?: boolean;
   logging?: string;
 }
