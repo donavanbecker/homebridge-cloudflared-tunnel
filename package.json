@@ -1,0 +1,68 @@
+{
+  "displayName": "Cloudflared Tunnel",
+  "name": "homebridge-cloudflared-tunnel",
+  "version": "0.1.0",
+  "description": "The Cloudflared Tunnel plugin allows you to run a Cloudflare-Tunnel for exposing your homebridge instance for remote access.",
+  "author": "donavanbecker",
+  "license": "Apache-2.0",
+  "icon": "https://raw.githubusercontent.com/donavanbecker/homebridge-cloudflared-tunnel/latest/branding/icon.png",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/donavanbecker/homebridge-cloudflared-tunnel.git"
+  },
+  "bugs": {
+    "url": "https://github.com/donavanbecker/homebridge-cloudflared-tunnel/issues"
+  },
+  "engines": {
+    "homebridge": "^1.7.0",
+    "node": "^18 || ^20"
+  },
+  "main": "dist/index.js",
+  "scripts": {
+    "check": "npm install && npm outdated",
+    "update": "ncu -u && npm update && npm install",
+    "update dependencies": "npm run check && npm run update",
+    "lint": "eslint src/**.ts",
+    "watch": "npm run build && npm link && nodemon",
+    "build": "rimraf ./dist && tsc",
+    "prepublishOnly": "npm run lint && npm run build",
+    "postpublish": "npm run clean",
+    "clean": "rimraf ./dist",
+    "test": "eslint src/**.ts"
+  },
+  "funding": [
+    {
+      "type": "Paypal",
+      "url": "https://www.paypal.me/donavanbecker"
+    },
+    {
+      "type": "GitHub",
+      "url": "https://github.com/sponsors/donavanbecker"
+    }
+  ],
+  "keywords": [
+    "homebridge-plugin",
+    "Cloudflare",
+    "cloudflared",
+    "Cloudflared Tunnel"
+  ],
+  "dependencies": {
+    "@homebridge/plugin-ui-utils": "^1.0.0",
+    "ctun": "^0.0.10",
+    "undici": "^6.2.0",
+    "rxjs": "^7.8.1",
+    "super-stringify": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "@typescript-eslint/eslint-plugin": "^6.15.0",
+    "@typescript-eslint/parser": "^6.15.0",
+    "eslint": "^8.56.0",
+    "nodemon": "^3.0.2",
+    "homebridge": "^1.7.0",
+    "npm-check-updates": "^16.14.12",
+    "rimraf": "^5.0.5",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.3.3"
+  }
+}
