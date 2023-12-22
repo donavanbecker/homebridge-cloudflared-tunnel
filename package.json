@@ -48,10 +48,7 @@
   ],
   "dependencies": {
     "@homebridge/plugin-ui-utils": "^1.0.0",
-    "ctun": "^0.0.10",
-    "undici": "^6.2.0",
-    "rxjs": "^7.8.1",
-    "super-stringify": "^1.0.0"
+    "ctun": "^0.0.10"
   },
   "devDependencies": {
     "@types/node": "^20.10.5",
