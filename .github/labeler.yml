@@ -1,5 +1,6 @@
 # Add 'branding' to any file changes within 'branding' folder
-branding: branding/*
+branding:
+  - branding/*
 
 # Add 'enhancement' label to any change to index.js file
 enhancement:
