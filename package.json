@@ -1,7 +1,7 @@
 {
   "displayName": "Cloudflared Tunnel",
   "name": "homebridge-cloudflared-tunnel",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "The Cloudflared Tunnel plugin allows you to run a Cloudflare-Tunnel for exposing your homebridge instance for remote access.",
   "author": "donavanbecker",
   "license": "Apache-2.0",

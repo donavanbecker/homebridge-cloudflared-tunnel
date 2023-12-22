@@ -1,5 +1,4 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires
-const { startTunnel } = require('ctun');
+import { startTunnel } from 'ctun';
 import { CloudflaredTunnelPlatformConfig } from './settings';
 import { API, DynamicPlatformPlugin, Logger, PlatformAccessory, Service, Characteristic } from 'homebridge';
 
