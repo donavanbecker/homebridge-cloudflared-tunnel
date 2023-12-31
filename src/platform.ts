@@ -5,6 +5,7 @@
 import { API, DynamicPlatformPlugin, Logging, PlatformAccessory } from 'homebridge';
 import { CloudflaredTunnelPlatformConfig } from './settings.js';
 import { startTunnel, startTunnelAuto, Tunnel, TunnelOptions } from 'ctun';
+import { setTimeout } from 'timers/promises';
 
 /**
  * HomebridgePlatform
@@ -47,14 +48,16 @@ export class CloudflaredTunnelPlatform implements DynamicPlatformPlugin {
 
 
     // verify the config
-    try {
-      this.verifyConfig();
-      //this.debugLog('Config OK');
-    } catch (e: any) {
-      //this.errorLog(JSON.stringify(e.message));
-      //this.debugLog(JSON.stringify(e));
-      return;
-    }
+    (async () => {
+      try {
+        await this.verifyConfig();
+        //this.debugLog('Config OK');
+      } catch (e: any) {
+        //this.errorLog(JSON.stringify(e.message));
+        //this.debugLog(JSON.stringify(e));
+        return;
+      }
+    })();
 
     // When this event is fired it means Homebridge has restored all cached accessories from disk.
     // Dynamic Platform plugins should only register new accessories after this event was fired,
@@ -64,8 +67,10 @@ export class CloudflaredTunnelPlatform implements DynamicPlatformPlugin {
       log.debug('Executed didFinishLaunching callback');
       // run the method to discover / register your devices as accessories
       try {
-        this.discoverDevices();
+        await this.createTunnel();
+        //this.log.info(`Tunnel Status: ${JSON.stringify(tunnel?.close())}`);
       } catch (e: any) {
+        this.log.error('Failed to Start Tunnel');
         //this.errorLog(`Failed to Discover Devices ${JSON.stringify(e.message)}`);
         //this.debugLog(JSON.stringify(e));
       }
@@ -87,21 +92,16 @@ export class CloudflaredTunnelPlatform implements DynamicPlatformPlugin {
    * Verify the config passed to the plugin is valid
    */
   async verifyConfig() {
-    try {
-      if (!this.config.url && !this.config.hostname) {
-        throw new Error('Missing required config: url');
-      }
-      if (!this.config.port && !this.config.hostname && !this.config.url && !this.config.protocol && !this.config.url) {
-        throw new Error('Missing one of the following configs: port, hostname, url, protocol, please check your config.json');
-      }
-      if (this.config.url && this.config.hostname) {
-        // this.debugLog(`URL: ${this.config.url}`);
-        //this.debugLog(`Hostname: ${this.config.hostname}`);
-        throw new Error('Cannot have both url and hostname in config. Please remove one.');
-      }
-    } catch (e: any) {
-      //this.errorLog(JSON.stringify(e.message));
-      //this.debugLog(JSON.stringify(e));
+    if (!this.config.url && !this.config.hostname) {
+      throw new Error('Missing required config: url');
+    }
+    if (!this.config.port && !this.config.hostname && !this.config.url && !this.config.protocol && !this.config.url) {
+      throw new Error('Missing one of the following configs: port, hostname, url, protocol, please check your config.json');
+    }
+    if (this.config.url && this.config.hostname) {
+      // this.debugLog(`URL: ${this.config.url}`);
+      //this.debugLog(`Hostname: ${this.config.hostname}`);
+      throw new Error('Cannot have both url and hostname in config. Please remove one.');
     }
     if (!this.config.logging) {
       this.config.logging = 'standard';
@@ -123,44 +123,26 @@ export class CloudflaredTunnelPlatform implements DynamicPlatformPlugin {
     }
   }
 
-  /**
-   * This method is used to discover the your location and devices.
-   * Accessories are registered by either their DeviceClass, DeviceModel, or DeviceID
-   */
-  async discoverDevices() {
-    try {
-      this.log.info(JSON.stringify(this.config));
-      //The local server URL to tunnel.
-      const options: TunnelOptions = {
-        url: this.config.url,
-        port: this.config.port,
-        hostname: this.config.hostname,
-        protocol: this.config.protocol,
-        verifyTLS: this.config.verifyTLS,
-      };
-      this.log.warn(`Starting Tunnel with Options: ${JSON.stringify(options)}`);
-      let tunnel: Tunnel | undefined;
-      if (this.config.startTunnelAuto) {
-        tunnel = await startTunnelAuto(options);
-      } else {
-        tunnel = await startTunnel(options);
-      }
-      this.log.info('Waiting 5 minute for tunnel to install and start');
-      this.wait(300000);  //5 minute in milliseconds
-      this.log.info(`Tunnel URL: ${JSON.stringify(tunnel?.getURL())}`);
-      //this.log.info(`Tunnel Status: ${JSON.stringify(tunnel?.close())}`);
-    } catch {
-      this.log.error('Failed to Start Tunnel');
+  async createTunnel() {
+    this.log.info(JSON.stringify(this.config));
+    //The local server URL to tunnel.
+    const options: TunnelOptions = {
+      url: this.config.url,
+      port: this.config.port,
+      hostname: this.config.hostname,
+      protocol: this.config.protocol,
+      verifyTLS: this.config.verifyTLS,
+    };
+    this.log.warn(`Starting Tunnel with Options: ${JSON.stringify(options)}`);
+    let tunnel: Tunnel | undefined;
+    if (this.config.startTunnelAuto) {
+      tunnel = await startTunnelAuto(options);
+    } else {
+      tunnel = await startTunnel(options);
     }
-  }
-
-
-  wait(ms){
-    const start = new Date().getTime();
-    let end = start;
-    while(end < start + ms) {
-      end = new Date().getTime();
-    }
+    this.log.info('Waiting 5 minute for tunnel to install and start');
+    await setTimeout(300000); // 5 minute in milliseconds
+    this.log.info(`Tunnel URL: ${JSON.stringify(tunnel?.getURL())}`);
   }
 
   /*logs() {
