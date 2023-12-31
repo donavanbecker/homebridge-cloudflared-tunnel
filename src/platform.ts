@@ -44,6 +44,7 @@ export class CloudflaredTunnelPlatform implements DynamicPlatformPlugin {
       protocol: config.protocol as 'http' | 'https' | undefined, // Updated type
       verifyTLS: config.verifyTLS as boolean,
       logging: config.logging as string,
+      startTunnelAuto: config.startTunnelAuto as boolean,
     };
 
 
@@ -142,8 +143,8 @@ export class CloudflaredTunnelPlatform implements DynamicPlatformPlugin {
       this.log.info('Starting Tunnel in Manual Install Mode');
       tunnel = await startTunnel(options);
     }
-    this.log.info('Waiting 5 minute for tunnel to install and start');
-    await setTimeout(300000); // 5 minute in milliseconds
+    this.log.info('Waiting 1 minute for tunnel to install and start');
+    await setTimeout(60000); // 1 minute in milliseconds
     this.log.info(`Tunnel URL: ${JSON.stringify(tunnel?.getURL())}`);
   }
 
