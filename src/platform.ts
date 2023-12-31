@@ -136,8 +136,10 @@ export class CloudflaredTunnelPlatform implements DynamicPlatformPlugin {
     this.log.warn(`Starting Tunnel with Options: ${JSON.stringify(options)}`);
     let tunnel: Tunnel | undefined;
     if (this.config.startTunnelAuto) {
+      this.log.info('Starting Tunnel in Auto Install Mode');
       tunnel = await startTunnelAuto(options);
     } else {
+      this.log.info('Starting Tunnel in Manual Install Mode');
       tunnel = await startTunnel(options);
     }
     this.log.info('Waiting 5 minute for tunnel to install and start');
