@@ -125,6 +125,7 @@ export class CloudflaredTunnelPlatform implements DynamicPlatformPlugin {
       this.log.info('Starting Tunnel in Auto Install Mode');
       const autoTunnel = await startTunnelAuto(options);
       this.log.info('Started Tunnel in Auto Install Mode');
+      this.log.info(`Tunnel URL: ${JSON.stringify(autoTunnel?.getURL())}`);
       if (autoTunnel) {
         const tunnelURL = await autoTunnel.getURL();
         this.log.info(`Tunnel URL: ${JSON.stringify(tunnelURL)}`);
@@ -133,6 +134,7 @@ export class CloudflaredTunnelPlatform implements DynamicPlatformPlugin {
       this.log.info('Starting Tunnel in Manual Install Mode');
       const manualTunnel = await startTunnel(options);
       this.log.info('Started Tunnel in Manual Install Mode');
+      this.log.info(`Tunnel URL: ${JSON.stringify(manualTunnel?.getURL())}`);
       if (manualTunnel) {
         const tunnelURL = await manualTunnel.getURL();
         this.log.info(`Tunnel URL: ${JSON.stringify(tunnelURL)}`);
@@ -140,6 +142,7 @@ export class CloudflaredTunnelPlatform implements DynamicPlatformPlugin {
     }
     this.log.info('Waiting 1 minute for tunnel to install and start');
     await setTimeout(60000); // 1 minute in milliseconds
+    this.log.info('Finished waiting for tunnel to install and start');
   }
 
   /*logs() {
