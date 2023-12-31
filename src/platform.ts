@@ -93,11 +93,8 @@ export class CloudflaredTunnelPlatform implements DynamicPlatformPlugin {
    * Verify the config passed to the plugin is valid
    */
   async verifyConfig() {
-    if (!this.config.url && !this.config.hostname) {
-      throw new Error('Missing required config: url');
-    }
-    if (!this.config.port && !this.config.hostname && !this.config.url && !this.config.protocol && !this.config.url) {
-      throw new Error('Missing one of the following configs: port, hostname, url, protocol, please check your config.json');
+    if (!this.config.url && (!this.config.protocol && !this.config.hostname && !this.config.port)) {
+      throw new Error('Missing required config: url or {protocol}://{hostname}:{port}, please check your config.json');
     }
     if (this.config.url && this.config.hostname) {
       // this.debugLog(`URL: ${this.config.url}`);
@@ -106,18 +103,6 @@ export class CloudflaredTunnelPlatform implements DynamicPlatformPlugin {
     }
     if (!this.config.logging) {
       this.config.logging = 'standard';
-    }
-    if (!this.config.hostname) {
-      this.config.hostname = 'localhost';
-    }
-    if (!this.config.port) {
-      this.config.port = 8581;
-    }
-    if (!this.config.protocol) {
-      this.config.protocol = 'http';
-    }
-    if (!this.config.verifyTLS) {
-      this.config.verifyTLS = false;
     }
     if (!this.config.startTunnelAuto) {
       this.config.startTunnelAuto = false;
@@ -129,9 +114,9 @@ export class CloudflaredTunnelPlatform implements DynamicPlatformPlugin {
     //The local server URL to tunnel.
     const options: TunnelOptions = {
       url: this.config.url,
-      port: this.config.port,
-      hostname: this.config.hostname,
       protocol: this.config.protocol,
+      hostname: this.config.hostname,
+      port: this.config.port,
       verifyTLS: this.config.verifyTLS,
     };
     this.log.warn(`Starting Tunnel with Options: ${JSON.stringify(options)}`);
