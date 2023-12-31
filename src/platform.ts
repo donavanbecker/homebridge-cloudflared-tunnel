@@ -38,6 +38,7 @@ export class CloudflaredTunnelPlatform implements DynamicPlatformPlugin {
     // Plugin options into our config variables.
     this.config = {
       platform: 'CloudflaredTunnelPlatform',
+      name: config.name as string,
       url: config.url as string,
       port: config.port as number,
       hostname: config.hostname as string,
