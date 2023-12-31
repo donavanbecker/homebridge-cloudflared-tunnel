@@ -139,9 +139,11 @@ export class CloudflaredTunnelPlatform implements DynamicPlatformPlugin {
     if (this.config.startTunnelAuto) {
       this.log.info('Starting Tunnel in Auto Install Mode');
       tunnel = await startTunnelAuto(options);
+      this.log.info('Started Tunnel in Auto Install Mode');
     } else {
       this.log.info('Starting Tunnel in Manual Install Mode');
       tunnel = await startTunnel(options);
+      this.log.info('Started Tunnel in Manual Install Mode');
     }
     this.log.info('Waiting 1 minute for tunnel to install and start');
     await setTimeout(60000); // 1 minute in milliseconds
