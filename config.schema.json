@@ -95,9 +95,9 @@
       "items": [
         "startTunnelAuto",
         "url",
-        "port",
-        "hostname",
         "protocol",
+        "hostname",
+        "port",
         "verifyTLS"
       ]
     },
