@@ -53,7 +53,7 @@
   ],
   "dependencies": {
     "@homebridge/plugin-ui-utils": "^1.0.0",
-    "ctun": "^0.0.11"
+    "ctun": "^0.0.12"
   },
   "devDependencies": {
     "@types/node": "^20.10.6",
