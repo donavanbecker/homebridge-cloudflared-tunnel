@@ -22,7 +22,11 @@ export class CloudflaredTunnelPlatform implements DynamicPlatformPlugin {
   platformLogging?: string;
   config!: CloudflaredTunnelPlatformConfig;
 
-  constructor(log: Logging, config: CloudflaredTunnelPlatformConfig, api: API) {
+  constructor(
+    log: Logging,
+    config: CloudflaredTunnelPlatformConfig,
+    api: API,
+  ) {
     // this.logs();
     //this.debugLog(`Finished initializing platform: ${config.name}`);
 
