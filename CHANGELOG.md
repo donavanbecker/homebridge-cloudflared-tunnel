@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file. This project uses [Semantic Versioning](https://semver.org/)
 
+## [1.0.1](https://github.com/donavanbecker/homebridge-cloudflared-tunnel/compare/v1.0.0...v1.0.1) (2024-01-31)
+
+### What's Changes
+
+- Housekeeping and updated dependencies.
+
+**Full Changelog**: https://github.com/donavanbecker/homebridge-cloudflared-tunnel/compare/v1.0.0...v1.0.1
+
 ## [1.0.0](https://github.com/donavanbecker/homebridge-cloudflared-tunnel/compare/v0.1.0...v1.0.0) (2024-01-12)
 
 ### What's Changes
