@@ -20,5 +20,7 @@ plugin allows you to run a Cloudflare-Tunnel for exposing your
 
 1. Search for "Cloudflared Tunnel" on the plugin screen of [Homebridge UI](https://github.com/homebridge/homebridge-config-ui-x).
 2. Click **Install**.
+3. Set Auto Install of Cloudflared Tunnel in Plugin Configs.
+4. Restart Plugin and Cloudlfare URL will be displayed in logs.
 
 
