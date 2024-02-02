@@ -66,6 +66,14 @@
         "placeholder": "homebridge.local",
         "required": false,
         "description": "The hostname to tunnel to. If you are using a URL, you do not need to specify the protocol, hostname, or port.",
+        "validation": {
+          "pattern": "^(?!\\s*$).+",
+          "functionBody": "return (!model.url);"
+        },
+        "validationMessage": "Hostname must be specified if not using a URL",
+        "pattern": "^(?!\\s*$).+",
+        "patternErrorMessage": "Hostname must be specified if not using a URL",
+        "validationKeywords": ["pattern"],
         "condition": {
           "functionBody": "return (!model.url);"
         }
@@ -76,8 +84,17 @@
         "placeholder": "8581",
         "required": false,
         "description": "The port to tunnel to. If you are using a URL, you do not need to specify the protocol, hostname, or port.",
-        "condition": {
-          "functionBody": "return (!model.url);"
+        "minimum": 1,
+        "maximum": 65535,
+        "validationMessage": "Port must be between 1 and 65535",
+        "validationKeywords": ["minimum", "maximum"],
+        "validation": {
+          "minimum": 1,
+          "maximum": 65535,
+          "functionBody": "return (!model.url);",
+          "condition": {
+            "functionBody": "return (!model.url);"
+          }
         }
       },
       "verifyTLS": {
