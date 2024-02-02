@@ -28,7 +28,7 @@
         "pattern": "^https?://",
         "required": false,
         "condition": {
-          "functionBody": "return (model.url || model.port || model.hostname || model.protocol);"
+          "functionBody": "return (!model.port || !model.hostname || !model.protocol);"
         }
       },
       "port": {
@@ -37,7 +37,7 @@
         "placeholder": "8581",
         "required": false,
         "condition": {
-          "functionBody": "return (model.url);"
+          "functionBody": "return (!model.url);"
         }
       },
       "hostname": {
@@ -46,7 +46,7 @@
         "placeholder": "homebridge.local",
         "required": true,
         "condition": {
-          "functionBody": "return (model.url);"
+          "functionBody": "return (!model.url);"
         }
       },
       "protocol": {
@@ -65,7 +65,7 @@
           }
         ],
         "condition": {
-          "functionBody": "return (model.url);"
+          "functionBody": "return (!model.url);"
         }
       },
       "verifyTLS": {
