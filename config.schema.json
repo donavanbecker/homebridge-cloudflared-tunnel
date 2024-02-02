@@ -29,30 +29,21 @@
         "required": false,
         "condition": {
           "functionBody": "return (!model.port && !model.hostname && !model.protocol);"
-        }
-      },
-      "port": {
-        "type": "number",
-        "title": "Port",
-        "placeholder": "8581",
-        "required": false,
-        "condition": {
-          "functionBody": "return (!model.url);"
-        }
-      },
-      "hostname": {
-        "type": "string",
-        "title": "hostname",
-        "placeholder": "homebridge.local",
-        "required": true,
-        "condition": {
-          "functionBody": "return (!model.url);"
+        },
+        "description": "The URL to tunnel to. If you are using a URL, you do not need to specify the protocol, hostname, or port.",
+        "default": "",
+        "format": "uri",
+        "patternErrorMessage": "URL must start with http:// or https://",
+        "validationMessage": "URL must start with http:// or https://",
+        "validationKeywords": ["pattern"],
+        "validation": {
+          "pattern": "^https?://"
         }
       },
       "protocol": {
         "type": "string",
         "title": "Protocol",
-        "required": true,
+        "required": false,
         "default": "",
         "oneOf": [
           {
@@ -64,6 +55,27 @@
             "enum": ["https"]
           }
         ],
+        "description": "The protocol to use for the tunnel. If you are using a URL, you do not need to specify the protocol, hostname, or port.",
+        "condition": {
+          "functionBody": "return (!model.url);"
+        }
+      },
+      "hostname": {
+        "type": "string",
+        "title": "hostname",
+        "placeholder": "homebridge.local",
+        "required": false,
+        "description": "The hostname to tunnel to. If you are using a URL, you do not need to specify the protocol, hostname, or port.",
+        "condition": {
+          "functionBody": "return (!model.url);"
+        }
+      },
+      "port": {
+        "type": "number",
+        "title": "Port",
+        "placeholder": "8581",
+        "required": false,
+        "description": "The port to tunnel to. If you are using a URL, you do not need to specify the protocol, hostname, or port.",
         "condition": {
           "functionBody": "return (!model.url);"
         }
@@ -71,7 +83,15 @@
       "verifyTLS": {
         "type": "boolean",
         "title": "Verify TLS",
-        "required": false
+        "required": false,
+        "default": true,
+        "description": "Verify the TLS certificate of the origin server.",
+        "condition": {
+          "functionBody": "return (!model.url || (!model.protocol && !model.hostname && !model.port));"
+        },
+        "validation": {
+          "functionBody": "return (!model.url || (!model.protocol && !model.hostname && !model.port));"
+        }
       },
       "logging": {
         "title": "Plugin Logging Setting",
@@ -97,7 +117,12 @@
           }
         ]
       }
-    }
+    },
+      "dependentRequired": {
+        "protocol": ["hostname", "port"],
+        "hostname": ["protocol", "port"],
+        "port": ["protocol", "hostname"]
+      }
   },
   "layout": [
     {
