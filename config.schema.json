@@ -86,7 +86,6 @@
         "description": "The port to tunnel to. If you are using a URL, you do not need to specify the protocol, hostname, or port.",
         "minimum": 1,
         "maximum": 65535,
-        "pattern": "^(?!\\s*$).+",
         "validationMessage": "Port must be between 1 and 65535",
         "validationKeywords": ["minimum", "maximum"],
         "validation": {
