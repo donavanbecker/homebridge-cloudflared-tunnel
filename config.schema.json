@@ -9,36 +9,48 @@
   "schema": {
     "type": "object",
     "properties": {
-      "acceptCloudflareNotice": {
-        "type": "boolean",
-        "title": "Auto Start Tunnel Install",
-        "required": true,
-        "description": "Automatically start the Cloudflared Tunnel install process."
-      },
       "name": {
         "type": "string",
         "title": "Name",
         "default": "CloudflaredTunnel",
         "required": true
       },
+      "acceptCloudflareNotice": {
+        "type": "boolean",
+        "title": "Auto Start Tunnel Install",
+        "required": true,
+        "description": "Automatically start the Cloudflared Tunnel install process.",
+        "condition": {
+          "functionBody": "return (model.url || model.port || model.hostname || model.protocol);"
+        }
+      },
       "url": {
         "type": "string",
         "title": "URL",
         "placeholder": "http://localhost:8581",
         "pattern": "^https?://",
-        "required": false
+        "required": false,
+        "condition": {
+          "functionBody": "return (model.acceptCloudflareNotice);"
+        }
       },
       "port": {
         "type": "number",
         "title": "Port",
         "placeholder": "8581",
-        "required": false
+        "required": false,
+        "condition": {
+          "functionBody": "return (model.acceptCloudflareNotice);"
+        }
       },
       "hostname": {
         "type": "string",
         "title": "hostname",
         "placeholder": "homebridge.local",
-        "required": true
+        "required": true,
+        "condition": {
+          "functionBody": "return (model.acceptCloudflareNotice);"
+        }
       },
       "protocol": {
         "type": "string",
@@ -54,7 +66,10 @@
             "title": "HTTPS",
             "enum": ["https"]
           }
-        ]
+        ],
+        "condition": {
+          "functionBody": "return (model.acceptCloudflareNotice);"
+        }
       },
       "verifyTLS": {
         "type": "boolean",
