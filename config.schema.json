@@ -28,7 +28,7 @@
         "pattern": "^https?://",
         "required": false,
         "condition": {
-          "functionBody": "return (!model.port || !model.hostname || !model.protocol);"
+          "functionBody": "return (!model.port && !model.hostname && !model.protocol);"
         }
       },
       "port": {
