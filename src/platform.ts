@@ -125,7 +125,7 @@ export class CloudflaredTunnelPlatform implements DynamicPlatformPlugin {
     this.log.warn(`Starting Tunnel with Options: ${JSON.stringify(options)}`);
     const autoTunnel = await startTunnel(options);
     //this.log.info(`Tunnel Status: ${JSON.stringify(autoTunnel?.close())}`);
-    this.log.info(`Tunnel URL: ${JSON.stringify(autoTunnel?.getURL())}`);
+    //this.log.info(`Tunnel URL: ${JSON.stringify(autoTunnel?.getURL())}`);
     if (autoTunnel) {
       const tunnelURL = await autoTunnel.getURL();
       this.log.info(`Tunnel URL: ${JSON.stringify(tunnelURL)}`);
