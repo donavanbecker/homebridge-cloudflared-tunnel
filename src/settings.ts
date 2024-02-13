@@ -1,3 +1,7 @@
+/* Copyright(C) 2023-2024, donavanbecker (https://github.com/donavanbecker). All rights reserved.
+ *
+ * settings.ts: homebridge-cloudflared-tunnel.
+ */
 import { PlatformConfig } from 'homebridge';
 import { TunnelOptions } from 'untun';
 /**
